@@ -5,19 +5,18 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     imports: [
         ClientsModule.register([
             {
-                name: 'PRODUCT_SERVICE',
+                name: 'RABBITMQ_SERVICE',
                 transport: Transport.RMQ,
                 options: {
                     urls: [process.env.AMQP_URL],
-                    queue: 'catalogue_queue',
+                    queue: 'catalog_queue',
                     queueOptions: {
-                        durable: false
-                    },
-                },
-            },
+                        durable: false,
+                    }
+                }
+            }
         ]),
     ],
-    controllers: [],
-    providers: [RmqModule],
+    exports: ['RABBITMQ_SERVICE'],
 })
-export class RmqModule {}
+export class RabbitmqModule {}
