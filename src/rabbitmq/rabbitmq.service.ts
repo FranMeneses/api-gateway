@@ -1,15 +1,26 @@
 import { Injectable } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { ConfigService } from '@nestjs/config';
+import { ClientProxyFactory, Transport, ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class RabbitMQService {
-  constructor(
-    private readonly client: ClientProxy,
-    private readonly configService: ConfigService,
-  ) {}
+  private client: ClientProxy;
 
-  async sendMessage(queue: string, message: any) {
-    return this.client.emit(queue, message).toPromise();
+  constructor() {
+    this.client = ClientProxyFactory.create({
+      transport: Transport.RMQ,
+      options: {
+        urls: [process.env.AMQP_URL],
+        queue: 'catalog_queue',
+        queueOptions: {
+          durable: false
+        },
+      },
+    });
+  }
+
+  async sendMessage(message: { action: string, data: any }) {
+    const pattern = { cmd: message.action };
+    const payload = message.data;
+    return this.client.send(pattern, payload).toPromise();
   }
 }
