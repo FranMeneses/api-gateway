@@ -28,11 +28,28 @@ export class ProductsService {
     return this.rabbitMQService.sendMessage(message);
   }
 
+  async findAll() {
+    const message = {
+      action: 'findAll',
+      data: {},
+    };
+
+    return this.rabbitMQService.sendMessage(message);
+  }
+
+  async findOne(id: string) {
+    const message = {
+      action: 'findOne',
+      data: { id },
+    };
+
+    return this.rabbitMQService.sendMessage(message);
+  }
 
   async deleteProduct(id: string) {
     const message = {
       action: 'delete',
-      data: id,
+      data: { id },
     };
 
     return this.rabbitMQService.sendMessage(message);

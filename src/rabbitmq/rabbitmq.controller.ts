@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
-import { ProductsService } from '../products/products.service';
+import { ProductsService } from '../products/product.service';
 
 @Controller()
 export class RabbitMQController {
