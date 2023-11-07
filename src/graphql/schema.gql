@@ -1,18 +1,23 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
 
 type Product {
   id: ID!
   name: String!
   description: String!
   price: Float!
+  category: String
+  image: String
 }
 
 type Query {
   products: [Product!]!
-  product(id: ID!): Product
+  product(id: String!): Product!
 }
 
 type Mutation {
   createProduct(name: String!, description: String!, price: Float!): Product!
-  updateProduct(id: ID!, name: String, description: String, price: Float): Product!
-  deleteProduct(id: ID!): ID!
+  updateProduct(id: String!, name: String!, description: String!, price: Float!): Product!
+  deleteProduct(id: String!): String!
 }
