@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ProductModule } from './products/product.module';
 import { GraphQLModule } from '@nestjs/graphql';
-import { ProductsResolver } from './products/product.resolver';
+import { ProductResolver } from './products/product.resolver';
 import { ApolloDriver } from '@nestjs/apollo';
+import { RabbitMQService } from './rabbitmq/rabbitmq.service';
 
 @Module({
   imports: [
@@ -14,7 +14,6 @@ import { ApolloDriver } from '@nestjs/apollo';
       autoSchemaFile: 'src/graphql/schema.gql', 
     }),
   ],
-  controllers: [AppController],
-  providers: [AppService, ProductsResolver],
+  providers: [RabbitMQService, ProductResolver],
 })
 export class AppModule {}
