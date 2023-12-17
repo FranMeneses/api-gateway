@@ -2,9 +2,9 @@ import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { Product } from './product.model';
 import { RabbitMQService } from 'src/rabbitmq/rabbitmq.service';
 
-@Resolver(of => Product)
+@Resolver(() => Product)
 export class ProductResolver {
-  constructor(private rabbitMQService: RabbitMQService) {}
+  constructor(private rabbitMQService: RabbitMQService) { }
 
   @Query(returns => [Product])
   async products() {
@@ -20,11 +20,12 @@ export class ProductResolver {
     return new Product();
   }
 
-  @Mutation(returns => Product)
-  async createProduct(@Args('name') name: string, @Args('description') description: string, @Args('price') price: number) {
-    const product = { name, description, price };
+  @Mutation(() => Product)
+  async createProduct(@Args('name') name: string, @Args('description') description: string, @Args('price') price: number, @Args('category') category: string, @Args('image') image: string) {
+    console.log('createProduct', name, description, price, category, image);
+    const product = { name, description, price, category, image };
 
-    await this.rabbitMQService.sendMessage({ action: 'create', data: product });
+    //await this.rabbitMQService.sendMessage({ action: 'create', data: product });
 
     return product;
   }
