@@ -21,11 +21,23 @@ export class ProductResolver {
   }
 
   @Mutation(() => Product)
-  async createProduct(@Args('name') name: string, @Args('description') description: string, @Args('price') price: number, @Args('category') category: string, @Args('image') image: string) {
-    console.log('createProduct', name, description, price, category, image);
-    const product = { name, description, price, category, image };
-
-    //await this.rabbitMQService.sendMessage({ action: 'create', data: product });
+  async createProduct(
+    @Args('name') name: string,
+    @Args('price') price: number,
+    @Args('description') description: string,
+    @Args('category') category: string,
+    @Args('image') image: string
+  ) {
+    //console.log('createProduct', name, description, price, category, image);
+    const product = { name, price, description, category, image };
+    const message = {
+      pattern: 'catalog_queue',
+      data: {
+        action: 'create',
+        product
+      }
+    }
+    await this.rabbitMQService.sendMessage('catalog_queue', message);
 
     return product;
   }
