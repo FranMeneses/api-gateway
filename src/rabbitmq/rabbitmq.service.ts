@@ -6,15 +6,15 @@ export class RabbitMQService {
   private clients: { [key: string]: ClientProxy } = {};
 
   constructor() {
-    this.setupQueue('catalog_queue', "amqps://tpygkmqd:LEr4PsX-PFPIrwbUQ9xnMQAxjmcv47BZ@jackal.rmq.cloudamqp.com/tpygkmqd");
+    this.setupQueue('catalog_queue');
     // Agregar más colas aquí si es necesario
   }
 
-  private setupQueue(queueName: string, amqpUrl: string) {
+  private setupQueue(queueName: string) {
     this.clients[queueName] = ClientProxyFactory.create({
       transport: Transport.RMQ,
       options: {
-        urls: [amqpUrl],
+        urls: [process.env.AMQP_URL],
         queue: queueName,
         queueOptions: {
           durable: false,
@@ -30,8 +30,8 @@ export class RabbitMQService {
         pattern: message.pattern,
         data: message.data
       };
-      console.log(queueName, payload);
-      return client.send(queueName, payload).toPromise();
+      console.log(queueName + ' ha recibido un ' + message.data.action);
+      return client.send(payload.pattern, payload.data).toPromise();
     } else {
       throw new Error(`Queue ${queueName} is not configured.`);
     }

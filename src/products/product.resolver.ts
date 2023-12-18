@@ -28,7 +28,6 @@ export class ProductResolver {
     @Args('category') category: string,
     @Args('image') image: string
   ) {
-    //console.log('createProduct', name, description, price, category, image);
     const product = { name, price, description, category, image };
     const message = {
       pattern: 'catalog_queue',
@@ -38,20 +37,41 @@ export class ProductResolver {
       }
     }
     await this.rabbitMQService.sendMessage('catalog_queue', message);
-
     return product;
   }
 
-  // Aquí necesitas implementar las mutaciones updateProduct y deleteProduct.
-  // Por ahora, solo vamos a devolver un producto vacío o una cadena vacía.
-  @Mutation(returns => Product)
-  async updateProduct(@Args('id') id: string, @Args('name') name: string, @Args('description') description: string, @Args('price') price: number) {
-    const product = { name, description, price };
+  @Mutation(() => Product)
+  async updateProduct(
+    @Args('id') id: string,
+    @Args('name') name: string,
+    @Args('price') price: number,
+    @Args('description') description: string,
+    @Args('category') category: string,
+    @Args('image') image: string
+  ) {
+    const product = { id, name, price, description, category, image };
+    const message = {
+      pattern: 'catalog_queue',
+      data: {
+        action: 'update',
+        product
+      }
+    }
+    await this.rabbitMQService.sendMessage('catalog_queue', message);
     return product;
   }
 
   @Mutation(returns => String)
   async deleteProduct(@Args('id') id: string) {
+    const product = { id };
+    const message = {
+      pattern: 'catalog_queue',
+      data: {
+        action: 'delete',
+        product
+      }
+    }
+    await this.rabbitMQService.sendMessage('catalog_queue', message);
     return id;
   }
 }
