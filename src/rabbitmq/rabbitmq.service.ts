@@ -3,24 +3,37 @@ import { ClientProxyFactory, Transport, ClientProxy } from '@nestjs/microservice
 
 @Injectable()
 export class RabbitMQService {
-  private client: ClientProxy;
+  private clients: { [key: string]: ClientProxy } = {};
 
   constructor() {
-    this.client = ClientProxyFactory.create({
+    this.setupQueue('catalog_queue', "amqps://tpygkmqd:LEr4PsX-PFPIrwbUQ9xnMQAxjmcv47BZ@jackal.rmq.cloudamqp.com/tpygkmqd");
+    // Agregar más colas aquí si es necesario
+  }
+
+  private setupQueue(queueName: string, amqpUrl: string) {
+    this.clients[queueName] = ClientProxyFactory.create({
       transport: Transport.RMQ,
       options: {
-        urls: [process.env.AMQP_URL],
-        queue: 'catalog_queue',
+        urls: [amqpUrl],
+        queue: queueName,
         queueOptions: {
-          durable: false
+          durable: false,
         },
       },
     });
   }
 
-  async sendMessage(message: { action: string, data: any }) {
-    const pattern = { cmd: message.action };
-    const payload = message.data;
-    return this.client.send(pattern, payload).toPromise();
+  async sendMessage(queueName: string, message: { pattern: string, data: { action: string, product: any } }) {
+    const client = this.clients[queueName];
+    if (client) {
+      const payload = {
+        pattern: message.pattern,
+        data: message.data
+      };
+      console.log(queueName, payload);
+      return client.send(queueName, payload).toPromise();
+    } else {
+      throw new Error(`Queue ${queueName} is not configured.`);
+    }
   }
 }
